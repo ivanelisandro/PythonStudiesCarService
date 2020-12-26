@@ -691,6 +691,12 @@ files:
         """ Reports success """
         print("#educational_plugin test OK")
   learner_created: false
+- name: hypercar/tickets/templates/tickets/menu.html
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/projects/85/stages/471/implement#comment
-status: Unchecked
+status: Solved
+feedback:
+  message: Congratulations!
+  time: Sat, 26 Dec 2020 20:06:42 UTC
 record: -1

@@ -8,11 +8,11 @@
 	<li>Get diagnostic queue: 1</li>
 </ul>
 
-<p>They also need the ability to select when to process the next customer. A simple button that can be clicked to complete this action will work just fine.</p>
+<p>They also want the ability to select when to process the next customer. A simple button that can be clicked to complete this action will work just fine.</p>
 
 <h2 style="text-align: center;">Objectives</h2>
 
-<p>Please create an operator menu page that includes three <code class="language-html">&lt;div&gt;</code> elements with the content shown in the above list. The last element on the page should be a <code class="language-html">&lt;form&gt;</code> with the <code class="language-html">method</code> attribute equal to <code class="language-html">"post"</code>.</p>
+<p>You need to create an operator menu page containing three <code class="language-html">&lt;div&gt;</code> elements with the content shown in the above list. The last element on the page should be a <code class="language-html">&lt;form&gt;</code> with the <code class="language-html">method</code> attribute equal to <code class="language-html">"post"</code>.</p>
 
 <p>The form should contain a <code class="language-html">&lt;button&gt;</code> element with the <code class="language-html">type</code> attribute equal to <code class="language-html">"submit"</code>, and the button's label should be <code class="language-html">Process next</code>:</p>
 
@@ -28,7 +28,7 @@
 
 <p>The operator menu page should be available at <em>&lt;base_url&gt;/processing</em>, where <em>&lt;base_url&gt;</em> is the host.</p>
 
-<p>Please note that the processing URL doesn't contain a slash at the end, so your URL pattern shouldn't either. You can redirect GET requests to the right page with the help of <code class="language-html">RedirectView</code> if you need to:</p>
+<p>Note that the processing URL doesn't contain a slash at the end, so your URL pattern shouldn't either. You can redirect GET requests to the right page with the help of <code class="language-html">RedirectView</code> if you need to:</p>
 
 <pre><code class="language-python">from django.views.generic import RedirectView
 
