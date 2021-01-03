@@ -1,4 +1,4 @@
-import re
+from functools import partial
 from urllib.error import URLError
 from urllib.request import urlopen
 from hstest.check_result import CheckResult
@@ -6,32 +6,61 @@ from hstest.test_case import TestCase
 from hstest.django_test import DjangoTest
 
 
-class HypercarClientMenuTest(DjangoTest):
-    ELEMENT_PATTERN = '''<a[^>]+href=['"](?P<href>[a-zA-Z/_]+)['"][^>]*>'''
+class HypercarElecronicQueueTest(DjangoTest):
 
-    def get_client_menu_page(self) -> CheckResult:
+    def get_ticket(self, service: str, content: str, helper_msg: str) -> CheckResult:
         try:
-            page = self.read_page(f'http://localhost:{self.port}/menu')
-            links = re.findall(self.ELEMENT_PATTERN, page)
-            for link in (
-                '/get_ticket/change_oil',
-                '/get_ticket/inflate_tires',
-                '/get_ticket/diagnostic',
-            ):
-                if link not in links:
-                    return CheckResult.false(
-                        f'Menu page should contain <a> element with href {link}'
-                    )
-            return CheckResult.true()
+            page = self.read_page(f'http://localhost:{self.port}/get_ticket/{service}')
+            if content in page:
+                return CheckResult.true()
+            else:
+                return CheckResult.false(
+                    f'Expected to have {content} on /get_ticket/{service} page after\n'
+                    f'{helper_msg}'
+                )
         except URLError:
             return CheckResult.false(
-                'Cannot connect to the /menu page.'
+                f'Cannot connect to the /get_ticket/{service} page.'
             )
 
     def generate(self):
+        helper_msg_1 = '\tClient #1 get ticket for inflating tires\n'
+        helper_msg_2 = helper_msg_1 + '\tClient #2 get ticket for changing oil\n'
+        helper_msg_3 = helper_msg_2 + '\tClient #3 get ticket for changing oil\n'
+        helper_msg_4 = helper_msg_3 + '\tClient #4 get ticket for inflating tires\n'
+        helper_msg_5 = helper_msg_4 + '\tClient #5 get ticket for diagnostic\n'
         return [
             TestCase(attach=self.check_server),
-            TestCase(attach=self.get_client_menu_page),
+            TestCase(attach=partial(
+                self.get_ticket,
+                'inflate_tires',
+                'Please wait around 0 minutes',
+                helper_msg_1
+            )),
+            TestCase(attach=partial(
+                self.get_ticket,
+                'change_oil',
+                'Please wait around 0 minutes',
+                helper_msg_2
+            )),
+            TestCase(attach=partial(
+                self.get_ticket,
+                'change_oil',
+                'Please wait around 2 minutes',
+                helper_msg_3
+            )),
+            TestCase(attach=partial(
+                self.get_ticket,
+                'inflate_tires',
+                'Please wait around 9 minutes',
+                helper_msg_4
+            )),
+            TestCase(attach=partial(
+                self.get_ticket,
+                'diagnostic',
+                'Please wait around 14 minutes',
+                helper_msg_5
+            )),
         ]
 
     def check(self, reply, attach):
@@ -39,4 +68,4 @@ class HypercarClientMenuTest(DjangoTest):
 
 
 if __name__ == '__main__':
-    HypercarClientMenuTest('hypercar.manage').run_tests()
+    HypercarElecronicQueueTest('hypercar.manage').run_tests()
