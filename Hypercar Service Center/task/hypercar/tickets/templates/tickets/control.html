@@ -1,0 +1,7 @@
+{% for item in status %}
+  <div>{{item.description}}: {{item.count}}</div>
+{% endfor %}
+
+<form method="post">{% csrf_token %}
+  <button type="submit">Process next</button>
+</form>

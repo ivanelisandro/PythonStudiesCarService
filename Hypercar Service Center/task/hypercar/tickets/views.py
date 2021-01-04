@@ -5,25 +5,31 @@ from django.shortcuts import render
 from collections import deque
 
 
+class Operation:
+    def __init__(self, identifier, name, time, queue_description = ""):
+        self.identifier = identifier
+        self.name = name
+        self.time = time
+        self.queue_description = self.name if queue_description == "" else queue_description
+        self.queue_description += " queue"
+
+
 class ServiceManager:
-    change_oil = "change_oil"
-    inflate_tires = "inflate_tires"
-    diagnostic = "diagnostic"
-    oil_time = 2
-    tires_time = 5
-    diagnostic_time = 30
+    change_oil = Operation("change_oil", "Change oil", 2)
+    inflate_tires = Operation("inflate_tires", "Inflate tires", 5)
+    diagnostic = Operation("diagnostic", "Get diagnostic test", 30, "Get diagnostic")
     current_ticket = 0
 
     menu = [
-        {"name": "Change oil", "path": change_oil},
-        {"name": "Inflate tires", "path": inflate_tires},
-        {"name": "Get diagnostic test", "path": diagnostic},
+        {"name": change_oil.name, "path": change_oil.identifier},
+        {"name": inflate_tires.name, "path": inflate_tires.identifier},
+        {"name": diagnostic.name, "path": diagnostic.identifier},
     ]
 
     clients = {
-        change_oil: deque(),
-        inflate_tires: deque(),
-        diagnostic: deque(),
+        change_oil.identifier: deque(),
+        inflate_tires.identifier: deque(),
+        diagnostic.identifier: deque(),
     }
 
     def get_ticket(self):
@@ -32,15 +38,15 @@ class ServiceManager:
         return ticket
 
     def get_wait_time(self, operation):
-        _wait_time = len(self.clients[self.change_oil]) * self.oil_time
-        if operation == self.change_oil:
+        _wait_time = len(self.clients[self.change_oil.identifier]) * self.change_oil.time
+        if operation == self.change_oil.identifier:
             return _wait_time
 
-        _wait_time += len(self.clients[self.inflate_tires]) * self.tires_time
-        if operation == self.inflate_tires:
+        _wait_time += len(self.clients[self.inflate_tires.identifier]) * self.inflate_tires.time
+        if operation == self.inflate_tires.identifier:
             return _wait_time
 
-        _wait_time += len(self.clients[self.diagnostic]) * self.diagnostic_time
+        _wait_time += len(self.clients[self.diagnostic.identifier]) * self.diagnostic.time
         return _wait_time
 
     def add_to_queue(self, request_path):
@@ -54,6 +60,14 @@ class ServiceManager:
 
         self.clients[operation].appendleft(client)
         return client
+
+    def get_status(self):
+        status = [
+            {"description": self.change_oil.queue_description, "count": len(self.clients[self.change_oil.identifier])},
+            {"description": self.inflate_tires.queue_description, "count": len(self.clients[self.inflate_tires.identifier])},
+            {"description": self.diagnostic.queue_description, "count": len(self.clients[self.diagnostic.identifier])},
+        ]
+        return status
 
 
 manager = ServiceManager()
@@ -78,3 +92,12 @@ class TicketView(TemplateView):
     def get(self, request, *args, **kwargs):
         self.client = manager.add_to_queue(request.path)
         return render(request, self.template_name, {'client': self.client})
+
+
+class ControlView(TemplateView):
+    template_name = 'tickets/control.html'
+    status = []
+
+    def get(self, request, *args, **kwargs):
+        self.status = manager.get_status()
+        return render(request, self.template_name, {'status': self.status})

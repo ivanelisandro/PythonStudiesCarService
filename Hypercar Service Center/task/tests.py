@@ -6,7 +6,7 @@ from hstest.test_case import TestCase
 from hstest.django_test import DjangoTest
 
 
-class HypercarElecronicQueueTest(DjangoTest):
+class HypercarOperatorMenuTest(DjangoTest):
 
     def get_ticket(self, service: str, content: str, helper_msg: str) -> CheckResult:
         try:
@@ -23,6 +23,26 @@ class HypercarElecronicQueueTest(DjangoTest):
                 f'Cannot connect to the /get_ticket/{service} page.'
             )
 
+    def check_menu(self, service: str, content: str, menu_content: str,
+                   helper_msg: str) -> CheckResult:
+        try:
+            result = self.get_ticket(service, content, helper_msg)
+            if not result.result:
+                return result
+
+            page = self.read_page(f'http://localhost:{self.port}/processing')
+            if menu_content in page:
+                return CheckResult.true()
+            else:
+                return CheckResult.false(
+                    f'Expected to have {menu_content} on /processing page after\n'
+                    f'{helper_msg}'
+                )
+        except URLError:
+            return CheckResult.false(
+                f'Cannot connect to the /processing page.'
+            )
+
     def generate(self):
         helper_msg_1 = '\tClient #1 get ticket for inflating tires\n'
         helper_msg_2 = helper_msg_1 + '\tClient #2 get ticket for changing oil\n'
@@ -32,33 +52,38 @@ class HypercarElecronicQueueTest(DjangoTest):
         return [
             TestCase(attach=self.check_server),
             TestCase(attach=partial(
-                self.get_ticket,
+                self.check_menu,
                 'inflate_tires',
                 'Please wait around 0 minutes',
+                'Inflate tires queue: 1',
                 helper_msg_1
             )),
             TestCase(attach=partial(
-                self.get_ticket,
+                self.check_menu,
                 'change_oil',
                 'Please wait around 0 minutes',
+                'Change oil queue: 1',
                 helper_msg_2
             )),
             TestCase(attach=partial(
-                self.get_ticket,
+                self.check_menu,
                 'change_oil',
                 'Please wait around 2 minutes',
+                'Change oil queue: 2',
                 helper_msg_3
             )),
             TestCase(attach=partial(
-                self.get_ticket,
+                self.check_menu,
                 'inflate_tires',
                 'Please wait around 9 minutes',
+                'Inflate tires queue: 2',
                 helper_msg_4
             )),
             TestCase(attach=partial(
-                self.get_ticket,
+                self.check_menu,
                 'diagnostic',
                 'Please wait around 14 minutes',
+                'Get diagnostic queue: 1',
                 helper_msg_5
             )),
         ]
@@ -68,4 +93,4 @@ class HypercarElecronicQueueTest(DjangoTest):
 
 
 if __name__ == '__main__':
-    HypercarElecronicQueueTest('hypercar.manage').run_tests()
+    HypercarOperatorMenuTest('hypercar.manage').run_tests()
