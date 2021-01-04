@@ -1,3 +1,6 @@
-{% for item in menu %}
-  <a href="/get_ticket/{{ item.path }}">{{ item.name }}</a>
-{% endfor %}
+{% extends "tickets/base.html" %}
+{% block content %}
+  {% for item in menu %}
+    <a href="/get_ticket/{{ item.path }}" class="menu_label">{{ item.name }}</a>
+  {% endfor %}
+{% endblock %}

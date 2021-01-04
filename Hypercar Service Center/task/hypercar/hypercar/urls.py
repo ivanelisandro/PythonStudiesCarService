@@ -13,9 +13,11 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf import settings
+from django.conf.urls.static import static
 from django.views.generic import RedirectView
 from django.urls import path
-from tickets.views import WelcomeView, MenuView, TicketView, ControlView
+from tickets.views import WelcomeView, MenuView, TicketView, ControlView, NextClientView
 
 
 urlpatterns = [
@@ -25,5 +27,9 @@ urlpatterns = [
     path('get_ticket/inflate_tires/', TicketView.as_view()),
     path('get_ticket/diagnostic/', TicketView.as_view()),
     path('processing', ControlView.as_view()),
-    path('processing/', RedirectView.as_view(url='/processing'))
+    path('processing/', RedirectView.as_view(url='/processing')),
+    path('next', NextClientView.as_view()),
+    path('next/', RedirectView.as_view(url='/next')),
 ]
+
+urlpatterns += static(settings.STATIC_URL)

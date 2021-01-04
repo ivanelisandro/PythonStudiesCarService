@@ -809,6 +809,39 @@ files:
         """ Reports success """
         print("#educational_plugin test OK")
   learner_created: false
+- name: hypercar/tickets/templates/tickets/client_ticket.html
+  visible: true
+  text: |
+    <div>Your number is {{ client.ticket }}</div>
+    <div>Please wait around {{ client.wait_time }} minutes</div>
+  learner_created: true
+- name: hypercar/tickets/templates/tickets/control.html
+  visible: true
+  text: |
+    {% for item in status %}
+      <div>{{item.description}}: {{item.count}}</div>
+    {% endfor %}
+
+    <form method="post">{% csrf_token %}
+      <button type="submit">Process next</button>
+    </form>
+  learner_created: true
+- name: hypercar/tickets/templates/tickets/menu.html
+  visible: true
+  text: |
+    {% for item in menu %}
+      <a href="/get_ticket/{{ item.path }}">{{ item.name }}</a>
+    {% endfor %}
+  learner_created: true
+- name: hypercar/tickets/templates/tickets/base.html
+  visible: true
+  learner_created: true
+- name: hypercar/tickets/templates/tickets/next_client.html
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/projects/85/stages/474/implement#comment
-status: Unchecked
+status: Solved
+feedback:
+  message: Congratulations!
+  time: Mon, 04 Jan 2021 23:33:17 UTC
 record: -1

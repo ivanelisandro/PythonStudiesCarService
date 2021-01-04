@@ -1,7 +1,10 @@
-{% for item in status %}
-  <div>{{item.description}}: {{item.count}}</div>
-{% endfor %}
+{% extends "tickets/base.html" %}
+{% block content %}
+  {% for item in status %}
+    <div class="queue_label">{{item.description}}: {{item.count}}</div>
+  {% endfor %}
 
-<form method="post">{% csrf_token %}
-  <button type="submit">Process next</button>
-</form>
+  <form action="/processing" method="post">{% csrf_token %}
+    <button type="submit">Process next</button>
+  </form>
+{% endblock %}

@@ -1,2 +1,5 @@
-<div>Your number is {{ client.ticket }}</div>
-<div>Please wait around {{ client.wait_time }} minutes</div>
+{% extends "tickets/base.html" %}
+{% block content %}
+  <div class="ticket_label">Your number is {{ client.ticket }}</div>
+  <div class="please_wait_label">Please wait around {{ client.wait_time }} minutes</div>
+{% endblock %}

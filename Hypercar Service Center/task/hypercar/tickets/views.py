@@ -1,7 +1,7 @@
 from django.views import View
 from django.views.generic.base import TemplateView
 from django.http.response import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from collections import deque
 
 
@@ -19,6 +19,7 @@ class ServiceManager:
     inflate_tires = Operation("inflate_tires", "Inflate tires", 5)
     diagnostic = Operation("diagnostic", "Get diagnostic test", 30, "Get diagnostic")
     current_ticket = 0
+    next_client = None
 
     menu = [
         {"name": change_oil.name, "path": change_oil.identifier},
@@ -69,6 +70,23 @@ class ServiceManager:
         ]
         return status
 
+    def get_next_client(self):
+        if self.next_client is None:
+            return "Waiting for the next client"
+        else:
+            ticket = self.next_client["ticket"]
+            return f"Next ticket #{ticket}"
+
+    def call_next_client(self):
+        if len(self.clients[self.change_oil.identifier]) > 0:
+            self.next_client = self.clients[self.change_oil.identifier].pop()
+        elif len(self.clients[self.inflate_tires.identifier]) > 0:
+            self.next_client = self.clients[self.inflate_tires.identifier].pop()
+        elif len(self.clients[self.diagnostic.identifier]) > 0:
+            self.next_client = self.clients[self.diagnostic.identifier].pop()
+        else:
+            self.next_client = None
+
 
 manager = ServiceManager()
 
@@ -101,3 +119,15 @@ class ControlView(TemplateView):
     def get(self, request, *args, **kwargs):
         self.status = manager.get_status()
         return render(request, self.template_name, {'status': self.status})
+
+    def post(self, request, *args, **kwargs):
+        manager.call_next_client()
+        return redirect('/processing')
+
+
+class NextClientView(TemplateView):
+    template_name = 'tickets/next_client.html'
+    client = {}
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name, {'message': manager.get_next_client()})
