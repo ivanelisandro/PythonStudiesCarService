@@ -1,0 +1,21 @@
+type: code
+files:
+- name: main.py
+  visible: true
+  text: |-
+    def get_number(num):
+        """Return the number one less than the given positive number.
+
+        Arguments:
+        num -- an integer.
+        Return values:
+        An integer one less than the input number.
+        """
+        pass
+  learner_created: false
+feedback_link: https://hyperskill.org/learn/step/11874#comment
+status: Solved
+feedback:
+  message: <html>Correct solution</html>
+  time: Wed, 06 Jan 2021 21:31:19 UTC
+record: -1
